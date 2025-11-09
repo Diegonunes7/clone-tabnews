@@ -5,6 +5,7 @@ const serverStartedAt = Date.now();
 
 function buildApplicationStatus() {
   const uptimeSeconds = Math.floor((Date.now() - serverStartedAt) / 1000);
+
   return {
     name: packageJson.name,
     version: packageJson.version,
@@ -17,17 +18,22 @@ async function status(request, response) {
   try {
     const updatedAt = new Date().toISOString();
 
-    const queryVersionDataBaseResult = await database.query("SHOW server_version;");
+    const queryVersionDataBaseResult = await database.query(
+      "SHOW server_version;",
+    );
     const queryVersionDataBaseValue = parseInt(
       queryVersionDataBaseResult.rows[0].server_version,
     );
 
-    const maxConnectionsDataBaseResult = await database.query("SHOW max_connections;");
+    const maxConnectionsDataBaseResult = await database.query(
+      "SHOW max_connections;",
+    );
     const maxConnectionsDataBaseValue = parseInt(
       maxConnectionsDataBaseResult.rows[0].max_connections,
     );
 
     const databaseName = process.env.POSTGRES_DB;
+
     const rountConnectionsDataBaseResult = await database.query({
       text: "SELECT count(*)::int as count_connections FROM pg_stat_activity where datname = $1",
       values: [databaseName],

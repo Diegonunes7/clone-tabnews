@@ -60,3 +60,32 @@ test("GET to /api/v1/status should return property database.count_connections", 
     dependencies.database.max_connections,
   );
 });
+
+test("GET to /api/v1/status should return property application with app info", async () => {
+  const response = await fetch("http://localhost:3000/api/v1/status");
+  const responseBody = await response.json();
+
+  // application deve existir
+  expect(responseBody).toHaveProperty("application");
+
+  const { application } = responseBody;
+
+  // application deve ser um objeto
+  expect(typeof application).toBe("object");
+  expect(application).not.toBeNull();
+
+  // deve ter as chaves obrigatórias
+  expect(application).toHaveProperty("name");
+  expect(application).toHaveProperty("version");
+  expect(application).toHaveProperty("uptime_seconds");
+  expect(application).toHaveProperty("environment");
+
+  // uptime_seconds numérico
+  expect(typeof application.uptime_seconds).toBe("number");
+
+  // environment deve indicar o ambiente da aplicação
+  expect(typeof application.environment).toBe("string");
+  expect(["development", "test", "production"]).toContain(application.environment);
+});
+
+
